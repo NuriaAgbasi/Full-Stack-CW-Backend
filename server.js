@@ -59,7 +59,7 @@ async function start() {
       );
 
       if (result.modifiedCount === 0) {
-        return res.status(404).json({ message: "Lesson not found or no change in spaces." });
+        return res.status(404).json({ message: "Leeson not available or no change in spaces." });
       }
 
       const updatedLesson = await db.collection('lessons').findOne({ id: lessonId });
