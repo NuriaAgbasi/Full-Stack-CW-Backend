@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
 
-// to get the __dirname
+// get directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
