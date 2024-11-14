@@ -123,7 +123,7 @@ async function start() {
       res.json(results);
     } catch (error) {
       console.error("Error during search:", error);
-      res.status(500).json({ message: "An error occurred during search." });
+      res.status(500).json({ message: "An error occurred during search!" });
     }
   });
 
