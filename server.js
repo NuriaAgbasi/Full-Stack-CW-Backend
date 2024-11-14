@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path'; 
+import cors from 'cors'; 
 import { fileURLToPath } from 'url'; 
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
@@ -16,6 +17,7 @@ async function start() {
   const db = client.db('WebStore');
 
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   //This logs any inocoming request made to the server.
@@ -27,11 +29,20 @@ async function start() {
   // gets the images from the images folder. 
   app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-  //gets all the lessons in the db
   app.get('/lessons', async (req, res) => {
-    const lessons = await db.collection('lessons').find({}).toArray();
-    res.send(lessons);
+    try {
+      const lessons = await db.collection('lessons')
+        .find({})
+        .sort({ id: 1 })  //sorts the retrieved data
+        .toArray();
+      res.send(lessons);
+    } catch (error) {
+      console.error('Error retrieving lessons:', error);  //error catcher
+      res.status(500).send('Internal Server Error');
+    }
   });
+  
+  
 
   async function populateCartIds(ids) {
     const lessons = await Promise.all(
@@ -162,7 +173,7 @@ app.put('/lessons/:id', async (req, res) => {
       $pull: { cartItems: lessonId },
     });
   
-    const user = await db.collection('users').findOne({ id: req.params.userId });
+    const user = await db.collection('users').findOne({ id:  req.params.userId });
     const populatedCart = await populateCartIds(user.cartItems);
     res.json(populatedCart);
   });
