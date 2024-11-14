@@ -107,7 +107,7 @@ async function start() {
     }
   });
 
-  // handle search 
+  // handle search as you type
   app.get('/search', async (req, res) => {
     try {
       const { query } = req.query;
