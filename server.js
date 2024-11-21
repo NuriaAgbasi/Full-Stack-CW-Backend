@@ -127,8 +127,13 @@ async function start() {
     }
   });
 
-  app.listen(8000, () => {
-    console.log('Server is listening on port 8000!');
+  app.get('/', async (req, res) => {
+    res.send('Welcome to The store to see the lessons go to /lessons');
+  });
+
+  const PORT = process.env.PORT || 8000;
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}!`);
   });
 }
 
