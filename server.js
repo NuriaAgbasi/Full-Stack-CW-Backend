@@ -27,7 +27,7 @@ async function start() {
   });
 
   // Serves images from the 'public/images' folder
-  app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
   // Route to get all lessons
   app.get('/lessons', async (req, res) => {
@@ -144,7 +144,7 @@ async function start() {
   const PORT = process.env.PORT || 8000;
   app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}!!`);
-  });
+  }); 
 }
 
 start();
