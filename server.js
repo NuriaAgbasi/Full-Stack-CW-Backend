@@ -19,7 +19,6 @@ async function start() {
   const app = express();
   app.use(cors());
   app.use(express.json());
-
   // Logs any incoming request made to the server
   app.use((req, res, next) => {
     console.log(`${req.method} request to ${req.url} at ${new Date().toISOString()}`);
@@ -75,23 +74,32 @@ app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
     try {
       const { name, phoneNumber, items } = req.body;
   
+      // Validate request body
       if (!name || !phoneNumber || !items || items.length === 0) {
         return res.status(400).json({ message: "All fields are required." });
       }
   
-      const lessons = await db.collection('lessons').find({ id: { $in: items.map(item => item.id) } }).toArray();
+      // Find lessons in the database
+      const lessons = await db.collection('lessons').find({ 
+        id: { $in: items.map(item => item.id) } 
+      }).toArray();
   
+      // Check if all lessons exist
       if (lessons.length !== items.length) {
         return res.status(404).json({ message: "Some lessons were not found." });
       }
   
+      // Validate availability for each item 
       for (const item of items) {
         const lesson = lessons.find(lesson => lesson.id === item.id);
         if (!lesson || lesson.spaces < item.quantity) {
-          return res.status(400).json({ message: `Not enough spaces for lesson: ${lesson?.subject || item.id}` });
+          return res.status(400).json({ 
+            message: `Not enough spaces for lesson: ${lesson?.subject || item.id}` 
+          });
         }
       }
   
+      // Create the order
       const order = {
         name,
         phoneNumber,
@@ -101,20 +109,14 @@ app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
   
       await db.collection('orders').insertOne(order);
   
-      // Deduct spaces from lessons
-      for (const item of items) {
-        await db.collection('lessons').updateOne(
-          { id: item.id },
-          { $inc: { spaces: -item.quantity } }
-        );
-      }
-  
+      // Respond with the created order
       res.status(201).json(order);
     } catch (error) {
       console.error("Error creating order:", error);
       res.status(500).json({ message: "An error occurred while creating the order." });
     }
   });
+  
   
 
   // handle search as you type
